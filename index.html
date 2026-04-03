@@ -45,48 +45,123 @@
     var map = L.map('map').setView([24.7136, 46.6753], 6);
     L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png').addTo(map);
 
+    // مصفوفة لتخزين علامات الصيدليات عشان نتحكم في التول تيب بتاعها
+    var pharmacyMarkers = [];
+
     var pharmacies = [
-        { name: "LEMON 001", lat: 24.8465142, lng: 46.8902194 },
-        { name: "LEMON 002", lat: 24.729111, lng: 46.8498986 },
-        { name: "LEMON 003", lat: 24.781194, lng: 46.6252356 },
-        { name: "LEMON 004", lat: 24.5945999, lng: 46.6689982 },
-        { name: "LEMON 005", lat: 24.74315562769068, lng: 46.84728969513117 },
-        { name: "LEMON 006", lat: 24.72536443430444, lng: 46.85385656633282 },
-        { name: "LEMON 007", lat: 24.716303322550402, lng: 46.827577817485924 },
-        { name: "LEMON 008", lat: 24.614628629579848, lng: 46.747283199628455 },
-        { name: "LEMON 009", lat: 24.5641143, lng: 46.71623283 },
-        { name: "LEMON 010", lat: 24.6651712, lng: 46.7236585 },
-        { name: "LEMON 011", lat: 24.629493176760054, lng: 46.7278372615851 },
-        { name: "LEMON 012", lat: 24.5720877, lng: 46.7861373 },
-        { name: "LEMON 013", lat: 24.6538063, lng: 46.749604 },
-        { name: "LEMON 014", lat: 24.7231007, lng: 46.7864255 },
-        { name: "LEMON 015", lat: 24.7219877, lng: 46.6512267 },
-        { name: "LEMON 016", lat: 24.6463951, lng: 46.7173254 },
-        { name: "LEMON 017", lat: 24.6377908, lng: 46.7168514 },
-        { name: "LEMON 018", lat: 24.530273, lng: 46.7019051 },
-        { name: "LEMON 019", lat: 24.7098379, lng: 46.6917919 },
-        // ... (يمكنك إكمال القائمة)
+        { name: "LEMON 001 - Maaly", lat: 24.8465142, lng: 46.8902194 },
+        { name: "LEMON 002 - Abi Aswd -1", lat: 24.729111, lng: 46.8498986 },
+        { name: "LEMON 003 - Aqiq", lat: 24.781194, lng: 46.6252356 },
+        { name: "LEMON 004 - Swidi", lat: 24.5945999, lng: 46.6689982 },
+        { name: "LEMON 005 - Sabaa", lat: 24.74315562769068, lng: 46.84728969513117 },
+        { name: "LEMON 006 - Abi Aswd -2", lat: 24.72536443430444, lng: 46.85385656633282 },
+        { name: "LEMON 007 - 40th Street", lat: 24.716303322550402, lng: 46.827577817485924 },
+        { name: "LEMON 008 - Mansourah", lat: 24.614628629579848, lng: 46.747283199628455 },
+        { name: "LEMON 009 - Badr shifaa", lat: 24.5641143, lng: 46.71623283 },
+        { name: "LEMON 010 - Malaz", lat: 24.6651712, lng: 46.7236585 },
+        { name: "LEMON 011 - Hella 1", lat: 24.629493176760054, lng: 46.7278372615851 },
+        { name: "LEMON 012 - Azyzyiah", lat: 24.5720877, lng: 46.7861373 },
+        { name: "LEMON 013 - Malaz", lat: 24.6538063, lng: 46.749604 },
+        { name: "LEMON 014 - Emam Shafei", lat: 24.7231007, lng: 46.7864255 },
+        { name: "LEMON 015 - Mohamdia", lat: 24.7219877, lng: 46.6512267 },
+        { name: "LEMON 016 - Villagio Mall", lat: 24.6463951, lng: 46.7173254 },
+        { name: "LEMON 017 - Batha", lat: 24.6377908, lng: 46.7168514 },
+        { name: "LEMON 018 - Shifaa", lat: 24.530273, lng: 46.7019051 },
+        { name: "LEMON 019 - Sulynmania", lat: 24.7098379, lng: 46.6917919 },
+        { name: "LEMON 021 - Aziziya", lat: 24.5937014, lng: 46.7572405 },
+        { name: "LEMON 022 - Fayroz Al Shifa", lat: 24.562746421120053, lng: 46.70758809165188 },
+        { name: "LEMON 023 - Dabab (EVA)", lat: 24.6908585, lng: 46.700569 },
+        { name: "LEMON 024 - Aziziya", lat: 24.57938859120898, lng: 46.782099021064056 },
+        { name: "LEMON 025 - Andalus", lat: 24.7471388, lng: 46.7882928 },
+        { name: "LEMON 026 - Towaiq", lat: 24.5589531, lng: 46.5738102 },
+        { name: "LEMON 027 - Dent", lat: 24.7489359, lng: 46.6669563 },
+        { name: "LEMON 028 - Takhassosi", lat: 24.700315409869308, lng: 46.66795709796701 },
+        { name: "LEMON 029 - Wadi", lat: 24.7882692, lng: 46.6913083 },
+        { name: "LEMON 030 AL HAYAH", lat: 24.6371286, lng: 46.7145039 },
+        { name: "LEMON 031 - Farabi 1", lat: 24.5997711, lng: 46.7131853 },
+        { name: "LEMON 032 - Nazim", lat: 24.79633812346519, lng: 46.88975527380816 },
+        { name: "LEMON 033 - Ar rass", lat: 25.854844, lng: 43.501515 },
+        { name: "LEMON 034 - Mamlaka", lat: 24.71008142195871, lng: 46.675886917798785 },
+        { name: "LEMON 035 - Om Al Hamam 1", lat: 24.6881754817757, lng: 46.643666003443144 },
+        { name: "LEMON 036 - Aqaria", lat: 28.4189084, lng: 45.9847085 },
+        { name: "LEMON 037 - Ar rass", lat: 25.8754722, lng: 43.5070556 },
+        { name: "LEMON 038 - shimas Buraidah", lat: 26.3375313, lng: 43.9648384 },
+        { name: "LEMON 039 - Twiq 1", lat: 24.5920471, lng: 46.5539551 },
+        { name: "LEMON 040 - montazah buraidah", lat: 26.3544351, lng: 43.953959 },
+        { name: "LEMON 041 - Morooj", lat: 24.7474986, lng: 46.6614811 },
+        { name: "LEMON 042 - Ahsa St.", lat: 24.6940256, lng: 46.7322512 },
+        { name: "LEMON 043 - Farabi 2", lat: 24.69039109, lng: 46.65052236 },
+        { name: "LEMON 044 - sulaimanya hafr al batin", lat: 28.4042314, lng: 45.9348347 },
+        { name: "LEMON 045 - nozha hafr albatin", lat: 28.4134638, lng: 45.9334227 },
+        { name: "LEMON 046 - Rabya", lat: 24.563207, lng: 46.8415153 },
+        { name: "LEMON 047 - Habib Nakheel", lat: 24.7526809, lng: 46.6484442 },
+        { name: "LEMON 048 - Ar rayan buraidah", lat: 26.3929276, lng: 43.9206604 },
+        { name: "LEMON 049 - Rawabi", lat: 24.6991871, lng: 46.7807825 },
+        { name: "LEMON 050 - tamimi Market hafr al batin", lat: 28.4092195, lng: 45.9718382 },
+        { name: "LEMON 051 - mansourah", lat: 24.619181, lng: 46.744481 },
+        { name: "LEMON 052 - Hella 2", lat: 24.6291574, lng: 46.7328473 },
+        { name: "LEMON 053 - Uqadh", lat: 24.516544, lng: 46.67837 },
+        { name: "LEMON 055 - Nahwand", lat: 24.572008436306593, lng: 46.770017347129766 },
+        { name: "LEMON 056 - Yarmook 2", lat: 24.8084887365435, lng: 46.80154240587642 },
+        { name: "LEMON 058 - Qirwan", lat: 24.8237997, lng: 46.5932094 },
+        { name: "LEMON 059 - Hozimi 1", lat: 24.6787742, lng: 46.7271352 },
+        { name: "LEMON 060 - Hozimi 2", lat: 24.6856694, lng: 46.7664515 },
+        { name: "LEMON 061 - Nahda", lat: 24.7746771, lng: 46.8256638 },
+        { name: "LEMON 062 - Ghadeer", lat: 24.772084, lng: 46.6514352 },
+        { name: "LEMON 063 - Ibn Hazm", lat: 24.604594977073535, lng: 46.595643285767736 },
+        { name: "LEMON 064 - Tanja", lat: 24.60112874325963, lng: 46.65800227425762 },
+        { name: "LEMON 065 - Deraya", lat: 24.74566239359617, lng: 46.579022045249175 },
+        { name: "LEMON 066 - Jax", lat: 24.75467900068759, lng: 46.54549096782298 },
+        { name: "LEMON 067 - Oyayna", lat: 24.9048868, lng: 46.3917239 },
+        { name: "LEMON 069 - Tulip", lat: 28.4030726, lng: 45.9897073 },
+        { name: "LEMON 070 - Nabd Al Yasmin", lat: 24.80810297374221, lng: 46.63824117852194 },
+        { name: "LEMON 071 - ALBASHAAYER JEDDAH", lat: 21.7896292, lng: 39.1813329 },
+        { name: "LEMON 073 - Swan", lat: 24.760328957143702, lng: 46.673973753936075 },
+        { name: "LEMON 075 - Basateen", lat: 26.3183434, lng: 44.0162461 },
+        { name: "LEMON 077 - Sary", lat: 21.5806862, lng: 39.1606036 },
+        { name: "LEMON 078 - Safa", lat: 21.5812331, lng: 39.2174463 },
+        { name: "LEMON 079 - Sanabel", lat: 21.400745, lng: 39.2628722 },
+        { name: "LEMON 80 - Rahmanya 2 Jeddah", lat: 21.777252113397292, lng: 39.21572095322889 }
     ];
 
+    // إضافة علامات الصيدليات بدون إظهار الاسم فوراً
     pharmacies.forEach(p => {
-        L.marker([p.lat, p.lng], {icon: pharmacyIcon})
+        var marker = L.marker([p.lat, p.lng], {icon: pharmacyIcon})
          .addTo(map)
-         .bindTooltip(p.name, {permanent: true, direction: 'top', offset: [0, -20]})
-         .bindPopup(p.name);
+         .bindTooltip(p.name, {permanent: true, direction: 'top', offset: [0, -20]});
+        
+        // إخفاء التول تيب مبدئياً
+        marker.closeTooltip();
+        pharmacyMarkers.push(marker);
+    });
+
+    // وظيفة التحكم في ظهور الأسماء بناءً على الزوم
+    map.on('zoomend', function() {
+        var currentZoom = map.getZoom();
+        pharmacyMarkers.forEach(marker => {
+            if (currentZoom >= 13) { // لو الزوم 13 أو أكتر (قريب) أظهر الأسماء
+                marker.openTooltip();
+            } else { // لو الزوم أقل (بعيد) اخفي الأسماء
+                marker.closeTooltip();
+            }
+        });
     });
 
     function readLocationFromUrl() {
         var hash = window.location.hash.substring(1);
         if (hash) {
             var coords = hash.split(',');
-            var lat = parseFloat(coords[0]);
-            var lng = parseFloat(coords[1]);
-            if (!isNaN(lat) && !isNaN(lng)) {
-                L.marker([lat, lng], { icon: clientIcon }).addTo(map).bindPopup("موقع العميل").openPopup();
-                map.setView([lat, lng], 13);
+            if (coords.length === 2) {
+                var lat = parseFloat(coords[0]);
+                var lng = parseFloat(coords[1]);
+                if (!isNaN(lat) && !isNaN(lng)) {
+                    L.marker([lat, lng], { icon: clientIcon }).addTo(map).bindPopup("موقع العميل").openPopup();
+                    map.setView([lat, lng], 13); // ده هيخلي الأسماء تظهر تلقائياً لأن الزوم = 13
+                }
             }
         }
     }
+    window.onload = readLocationFromUrl;
     window.onload = readLocationFromUrl;
 </script>
 </body>
