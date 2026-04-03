@@ -3,35 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام صيدليات ليمون - تحديد ذكي</title>
+    <title>نظام صيدليات ليمون - عرض موقع العميل</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 15px; background-color: #f0f2f5; text-align: center; }
-        #map { height: 500px; width: 100%; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-top: 15px; }
-        .controls { background: white; padding: 15px; border-radius: 15px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        input { padding: 12px; width: 250px; border: 2px solid #ddd; border-radius: 8px; outline: none; text-align: center; }
-        button { padding: 12px 20px; cursor: pointer; border: none; border-radius: 8px; color: white; font-weight: bold; transition: 0.3s; }
-        .btn-find { background-color: #4CAF50; flex-grow: 1; max-width: 200px; }
-        .btn-reset { background-color: #f44336; }
-        .status-bar { background: #fff; padding: 10px; border-radius: 10px; margin-bottom: 10px; display: none; color: #2e7d32; font-weight: bold; border: 1px solid #c8e6c9; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f0f2f5; }
+        #map { height: 100vh; width: 100%; } /* الخريطة تأخذ كامل الشاشة */
+        .title-overlay { 
+            position: absolute; top: 10px; right: 10px; z-index: 1000; 
+            background: rgba(255, 255, 255, 0.9); padding: 10px 20px; 
+            border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            font-weight: bold; color: #2c3e50;
+        }
     </style>
 </head>
 <body>
 
-    <h2 style="color: #2c3e50; margin-top: 0;">محدد صيدليات ليمون</h2>
-    
-    <div id="statusBar" class="status-bar">📍 تم التعرف على موقع العميل من الرابط</div>
-
-    <div class="controls">
-        <input type="text" id="locationInput" placeholder="أدخل الإحداثيات هنا...">
-        <button class="btn-find" onclick="findNearest()">أقرب صيدلية</button>
-        <button class="btn-reset" onclick="resetAll()">مسح</button>
-    </div>
-
+    <div class="title-overlay">محدد مواقع صيدليات ليمون</div>
     <div id="map"></div>
 
 <script>
+    // إعداد الأيقونات
     var pharmacyIcon = L.icon({
         iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
         iconSize: [20, 32], iconAnchor: [10, 32], popupAnchor: [1, -34]
@@ -42,9 +34,11 @@
         iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34]
     });
 
+    // تهيئة الخريطة (افتراضياً على الرياض)
     var map = L.map('map').setView([24.7136, 46.6753], 6);
     L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png').addTo(map);
 
+    // قائمة الصيدليات
     var pharmacies = [
         { name: "LEMON 001 - Maaly", lat: 24.8465142, lng: 46.8902194 },
         { name: "LEMON 002 - Abi Aswd -1", lat: 24.729111, lng: 46.8498986 },
@@ -71,7 +65,7 @@
         { name: "LEMON 024 - Aziziya", lat: 24.57938859120898, lng: 46.782099021064056 },
         { name: "LEMON 025 - Andalus", lat: 24.7471388, lng: 46.7882928 },
         { name: "LEMON 026 - Towaiq", lat: 24.5589531, lng: 46.5738102 },
-        { name: "LEMON 027 - Dent", lat: 24.7489359, lng: 46.6669563 },
+        { name: "LEMON 027 - Dent", lat: 24.7489359, lng: 46.6666563 },
         { name: "LEMON 028 - Takhassosi", lat: 24.700315409869308, lng: 46.66795709796701 },
         { name: "LEMON 029 - Wadi", lat: 24.7882692, lng: 46.6913083 },
         { name: "LEMON 030 AL HAYAH", lat: 24.6371286, lng: 46.7145039 },
@@ -121,79 +115,32 @@
         { name: "LEMON 80 - Rahmanya 2 Jeddah", lat: 21.777252113397292, lng: 39.21572095322889 }
     ];
 
+    // إضافة علامات الصيدليات
     pharmacies.forEach(p => {
         L.marker([p.lat, p.lng], {icon: pharmacyIcon}).addTo(map).bindPopup(p.name);
     });
 
-    var clientLat, clientLng, clientMarker;
-
-    // وظيفة جديدة كلياً لقراءة الإحداثيات بعد علامة الـ #
+    // وظيفة قراءة الموقع من الرابط والتركيز عليه
     function readLocationFromUrl() {
-        var hash = window.location.hash.substring(1); // تأخذ ما بعد الـ #
+        var hash = window.location.hash.substring(1);
         if (hash) {
             var coords = hash.split(',');
             if (coords.length === 2) {
                 var lat = parseFloat(coords[0]);
                 var lng = parseFloat(coords[1]);
                 if (!isNaN(lat) && !isNaN(lng)) {
-                    clientLat = lat; clientLng = lng;
-                    document.getElementById('locationInput').value = hash;
-                    document.getElementById('statusBar').style.display = 'block';
-                    updateClientMarker(lat, lng);
-                    // البحث التلقائي بعد ثانية
-                    setTimeout(findNearest, 1000);
+                    // وضع علامة العميل
+                    L.marker([lat, lng], { icon: clientIcon }).addTo(map).bindPopup("موقع العميل").openPopup();
+                    
+                    // التركيز على موقع العميل بزووم 13 (رؤية متوسطة)
+                    map.setView([lat, lng], 13);
                 }
             }
         }
     }
 
+    // التنفيذ عند التحميل
     window.onload = readLocationFromUrl;
-
-    function updateClientMarker(lat, lng) {
-        if (clientMarker) map.removeLayer(clientMarker);
-        clientMarker = L.marker([lat, lng], { icon: clientIcon, draggable: true }).addTo(map).bindPopup("موقع العميل").openPopup();
-        map.setView([lat, lng], 14);
-    }
-
-    function distance(lat1, lon1, lat2, lon2) {
-        var R = 6371;
-        var dLat = (lat2 - lat1) * Math.PI / 180;
-        var dLon = (lon2 - lon1) * Math.PI / 180;
-        var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    }
-
-    function findNearest() {
-        var val = document.getElementById('locationInput').value;
-        if (val.includes(',')) {
-            var parts = val.split(',');
-            clientLat = parseFloat(parts[0]);
-            clientLng = parseFloat(parts[1]);
-            updateClientMarker(clientLat, clientLng);
-        }
-
-        if (!clientLat) { alert("أدخل الإحداثيات أولاً"); return; }
-        var nearest = null;
-        var minDist = Infinity;
-        pharmacies.forEach(p => {
-            var d = distance(clientLat, clientLng, p.lat, p.lng);
-            if (d < minDist) { minDist = d; nearest = p; }
-        });
-        
-        map.flyTo([nearest.lat, nearest.lng], 15);
-        setTimeout(() => {
-            alert("أقرب صيدلية: " + nearest.name + "\nالمسافة: " + minDist.toFixed(2) + " كم");
-        }, 800);
-    }
-
-    function resetAll() {
-        if (clientMarker) map.removeLayer(clientMarker);
-        clientLat = null; clientLng = null;
-        document.getElementById('locationInput').value = "";
-        document.getElementById('statusBar').style.display = 'none';
-        window.location.hash = "";
-        map.setView([24.7136, 46.6753], 6);
-    }
 </script>
 </body>
 </html>
