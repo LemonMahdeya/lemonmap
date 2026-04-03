@@ -128,7 +128,7 @@
     pharmacies.forEach(p => {
         var marker = L.marker([p.lat, p.lng], {icon: pharmacyIcon})
          .addTo(map)
-         .bindTooltip(p.name, {permanent: true, direction: 'top', offset: [0, -20]});
+         .bindTooltip(p.name, {permanent: true, direction: 'top', offset: [0, -5]});
         
         // إخفاء التول تيب مبدئياً
         marker.closeTooltip();
